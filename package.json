@@ -1,0 +1,35 @@
+{
+  "name": "zero-css",
+  "version": "0.0.1",
+  "description": "Zero-runtime CSS-in-JS with static extraction",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./vite": {
+      "types": "./dist/vite-plugin.d.ts",
+      "import": "./dist/vite-plugin.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "peerDependencies": {
+    "vite": "^5.0.0 || ^6.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.6"
+  },
+  "files": [
+    "dist"
+  ],
+  "license": "MIT"
+}
+

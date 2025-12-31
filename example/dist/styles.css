@@ -1,0 +1,149 @@
+:root {
+  --jui-colors-white: #ffffff;
+  --jui-colors-black: #000000;
+  --jui-colors-black50: rgba(0, 0, 0, 0.5);
+  --jui-colors-transparent: transparent;
+  --jui-colors-current: currentColor;
+  --jui-colors-gray1: #fcfcfc;
+  --jui-colors-gray2: #f8f8f8;
+  --jui-colors-gray3: #f3f3f3;
+  --jui-colors-gray4: #ededed;
+  --jui-colors-gray5: #e8e8e8;
+  --jui-colors-gray6: #e2e2e2;
+  --jui-colors-gray7: #dbdbdb;
+  --jui-colors-gray8: #c7c7c7;
+  --jui-colors-gray9: #8f8f8f;
+  --jui-colors-gray10: #858585;
+  --jui-colors-gray11: #6f6f6f;
+  --jui-colors-gray12: #171717;
+  --jui-colors-primary1: #fbfdff;
+  --jui-colors-primary2: #f5faff;
+  --jui-colors-primary3: #edf6ff;
+  --jui-colors-primary4: #e1f0ff;
+  --jui-colors-primary5: #cee7fe;
+  --jui-colors-primary6: #b7d9f8;
+  --jui-colors-primary7: #96c7f2;
+  --jui-colors-primary8: #5eb0ef;
+  --jui-colors-primary9: #0091ff;
+  --jui-colors-primary10: #0081f1;
+  --jui-colors-primary11: #006adc;
+  --jui-colors-primary12: #00254d;
+  --jui-colors-success9: #30a46c;
+  --jui-colors-error9: #e5484d;
+  --jui-spacing-1: 4px;
+  --jui-spacing-2: 8px;
+  --jui-spacing-3: 12px;
+  --jui-spacing-4: 16px;
+  --jui-spacing-5: 20px;
+  --jui-spacing-6: 24px;
+  --jui-spacing-7: 28px;
+  --jui-spacing-8: 32px;
+  --jui-spacing-9: 40px;
+  --jui-spacing-10: 48px;
+  --jui-spacing-11: 64px;
+  --jui-spacing-px: 1px;
+  --jui-sizes-0: 0;
+  --jui-sizes-full: 100%;
+  --jui-sizes-screen: 100vw;
+  --jui-sizes-screenH: 100vh;
+  --jui-sizes-min: min-content;
+  --jui-sizes-max: max-content;
+  --jui-sizes-fit: fit-content;
+  --jui-fonts-sans: ui-sans-serif, system-ui, sans-serif;
+  --jui-fonts-mono: ui-monospace, monospace;
+  --jui-fontSizes-1: 12px;
+  --jui-fontSizes-2: 14px;
+  --jui-fontSizes-3: 16px;
+  --jui-fontSizes-4: 18px;
+  --jui-fontSizes-5: 20px;
+  --jui-fontSizes-6: 24px;
+  --jui-fontSizes-7: 28px;
+  --jui-fontSizes-8: 35px;
+  --jui-fontSizes-9: 60px;
+  --jui-fontWeights-1: 400;
+  --jui-fontWeights-2: 600;
+  --jui-lineHeights-1: 1;
+  --jui-lineHeights-2: 1.25;
+  --jui-lineHeights-3: 1.5;
+  --jui-lineHeights-4: 1.75;
+  --jui-lineHeights-5: 2;
+  --jui-letterSpacings-1: -0.05em;
+  --jui-letterSpacings-2: -0.025em;
+  --jui-letterSpacings-3: 0;
+  --jui-letterSpacings-4: 0.025em;
+  --jui-letterSpacings-5: 0.05em;
+  --jui-letterSpacings-6: 0.1em;
+  --jui-radii-1: 0;
+  --jui-radii-2: 4px;
+  --jui-radii-3: 6px;
+  --jui-radii-4: 8px;
+  --jui-radii-5: 12px;
+  --jui-radii-6: 16px;
+  --jui-radii-full: 9999px;
+  --jui-shadows-1: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --jui-shadows-2: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --jui-shadows-3: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --jui-shadows-4: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --jui-shadows-5: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --jui-transitions-1: all 50ms ease;
+  --jui-transitions-2: all 100ms ease;
+  --jui-transitions-3: all 150ms ease;
+}
+
+.zyu9zl2 { grid-template-columns: 1fr; }
+.z62mzyi { font-size: var(--jui-fontSizes-6); }
+.z1f4o44v { padding: var(--jui-spacing-4); }
+.z1ulnqlb { font-size: var(--jui-fontSizes-2); }
+.z1983gu4 { margin-top: var(--jui-spacing-2); }
+.z1sy5qgp { line-height: var(--jui-lineHeights-3); }
+.z3nm8f2 { padding: var(--jui-spacing-4); }
+.z1h9eiaa { background-color: var(--jui-colors-success9); }
+.zewizej { border-radius: var(--jui-radii-4); }
+.z1nima01 { color: var(--jui-colors-white); }
+.z1xxn4fr { background-color: var(--jui-colors-primary3); }
+.zvil54a { color: var(--jui-colors-primary11); }
+.z18n9a1p { display: grid; }
+.zmuhmwp { gap: var(--jui-spacing-4); }
+.z1983gu2 { margin-top: var(--jui-spacing-4); }
+.zgv1iz5 { padding-block: var(--jui-spacing-2); }
+.z1daeznb { padding-inline: var(--jui-spacing-4); }
+.zjwrwb5 { background-color: var(--jui-colors-gray4); }
+.z105ju5k { color: var(--jui-colors-gray12); }
+.z1o6t3ru { font-weight: var(--jui-fontWeights-2); }
+.zewizek { border-radius: var(--jui-radii-3); }
+.z5fdwah { border: none; }
+.z1u73pce { cursor: pointer; }
+.z1ma5tty { transition: var(--jui-transitions-2); }
+.z6gwa1c:hover { background-color: var(--jui-colors-gray5); }
+.z1xxn4fx { background-color: var(--jui-colors-primary9); }
+.zhuftk5:hover { background-color: var(--jui-colors-primary10); }
+.z6749kv:focus { outline: none; }
+.z1p1hzi8:focus { box-shadow: 0 0 0 2px white, 0 0 0 4px #0091ff; }
+.z18n8er6 { display: flex; }
+.zmuhmwu { gap: var(--jui-spacing-3); }
+.znmuaaw { flex-wrap: wrap; }
+.z1ulnqla { font-size: var(--jui-fontSizes-3); }
+.z105ju5n { color: var(--jui-colors-gray11); }
+.z11osd79 { letter-spacing: var(--jui-letterSpacings-1); }
+.z1sy5qgo { line-height: var(--jui-lineHeights-2); }
+.z607hqz { flex-direction: column; }
+.zk7otpr { background-color: var(--jui-colors-white); }
+.zewizei { border-radius: var(--jui-radii-5); }
+.z193213w { box-shadow: var(--jui-shadows-4); }
+.z1xd929f { max-width: 600px; }
+.z1rf93n2 { width: var(--jui-sizes-full); }
+.z1uibzi7 { align-items: center; }
+.zvmyjdf { justify-content: center; }
+.zverxyd { min-height: 100vh; }
+.zjwrwbb { background-color: var(--jui-colors-gray2); }
+.zq42ss1 { font-family: var(--jui-fonts-sans); }
+@media (min-width: 768px) {
+.z1k2nuld { grid-template-columns: 1fr 1fr; }
+.z62npqh { font-size: var(--jui-fontSizes-7); }
+.z1f4mnf3 { padding: var(--jui-spacing-6); }
+.z1f4f83l { padding: var(--jui-spacing-8); }
+}
+@media (min-width: 1024px) {
+.z62itl0 { font-size: var(--jui-fontSizes-8); }
+.z1f4f84j { padding: var(--jui-spacing-8); }
+}
