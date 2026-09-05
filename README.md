@@ -1,6 +1,6 @@
 # putty
 
-Zero-runtime, zero-config CSS-in-JS. Write CSS as a typed object; ship atomic classes and no JavaScript.
+Zero-runtime, zero-config CSS-in-JS. Plain CSS for component styles. Putty for layout, overrides, app styles, one-off styles etc.
 
 ```tsx
 import { cx } from 'puttycss';
@@ -11,8 +11,12 @@ import { cx } from 'puttycss';
     gap: 8,
     padding: '8px 16px',
     color: 'var(--gray-12)',
-    '&:hover': { backgroundColor: 'var(--gray-4)' },
-    '@media (min-width: 768px)': { padding: '12px 24px' },
+    '&:hover': {
+      backgroundColor: 'var(--gray-4)'
+    },
+    '@media (min-width: 768px)': { 
+      padding: '12px 24px'
+    },
   })}
 />
 ```
@@ -36,8 +40,6 @@ and the matching CSS is generated into your stylesheet. Nothing from `puttycss` 
 ```sh
 npm install -D puttycss
 ```
-
-`typescript` is a peer dependency (it's used to parse your source files at build time).
 
 ## Setup
 
@@ -114,29 +116,6 @@ Add `puttycss/postcss` to your PostCSS config for the stylesheet, and use `trans
 
 ## Writing styles
 
-```tsx
-cx({
-  // camelCase CSS properties
-  display: 'flex',
-  // numbers get px (except unitless properties such as lineHeight, opacity, zIndex, flex, fontWeight)
-  gap: 16,
-  lineHeight: 1.5,
-  // custom properties
-  '--card-padding': '16px',
-  // nested selectors; & is the element
-  '&:hover': { opacity: 0.8 },
-  '&[data-state="open"]': { color: 'red' },
-  '& > svg': { fill: 'currentColor' },
-  // at-rules, nestable with selectors in either order
-  '@media (min-width: 768px)': {
-    gap: 24,
-    '&:hover': { opacity: 1 },
-  },
-  '@container (min-width: 400px)': { display: 'grid' },
-  '@supports (backdrop-filter: blur(1px))': { backdropFilter: 'blur(8px)' },
-});
-```
-
 ### Everything must be static
 
 Because `cx()` is compiled away, its argument has to be an object literal made of literal strings, numbers and nested object literals. These are build errors, reported with file, line and column:
@@ -179,12 +158,6 @@ Since `cx()` returns `{ className }`, combining with other classes is just strin
 | `cwd`     | `process.cwd()`                      | Base directory.                                                         |
 
 `puttycss/vite` also accepts `postcss: false` to opt out of auto-registering the PostCSS plugin.
-
-## How it works
-
-Class names are a hash of the declaration (`property:value:selector:at-rules`), so they're deterministic and need no shared state. That lets the two halves run independently: the bundler transform rewrites each file on its own, and the PostCSS plugin scans your source tree, extracts the same declarations, and renders the stylesheet. They agree by construction.
-
-Rules are emitted in a fixed order (shorthands before longhands, base before pseudo-classes, media queries mobile-first), so `padding` vs `paddingLeft` conflicts resolve the same way no matter which file introduced them.
 
 ## License
 
