@@ -1,0 +1,22 @@
+:root {
+  --gray-1: #fcfcfc;
+  --gray-4: #ededed;
+  --gray-11: #6f6f6f;
+  --gray-12: #171717;
+  --blue-9: #0091ff;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  color: var(--gray-12);
+}
+
+@putty;

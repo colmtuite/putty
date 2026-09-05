@@ -1,8 +1,16 @@
 /**
- * Subset of CSS properties we support
- * This is intentionally not exhaustive - add properties as needed
+ * CSS properties accepted by `cx()`.
+ *
+ * Bare numbers are treated like React's `style` prop: they get a `px` suffix
+ * except on unitless properties (`lineHeight`, `opacity`, `zIndex`, `flex`, ...).
+ *
+ * This list is intentionally curated rather than exhaustive; add properties as needed.
+ * Custom properties (`--foo`) are always allowed.
  */
 export interface CSSProperties {
+  // Custom properties
+  [customProperty: `--${string}`]: string | number;
+
   // Layout
   display?: 'none' | 'block' | 'inline' | 'inline-block' | 'flex' | 'inline-flex' | 'grid' | 'inline-grid' | 'contents' | (string & {});
   position?: 'static' | 'relative' | 'absolute' | 'fixed' | 'sticky';
@@ -11,6 +19,12 @@ export interface CSSProperties {
   bottom?: string | number;
   left?: string | number;
   inset?: string | number;
+  insetInline?: string | number;
+  insetBlock?: string | number;
+  insetInlineStart?: string | number;
+  insetInlineEnd?: string | number;
+  insetBlockStart?: string | number;
+  insetBlockEnd?: string | number;
   zIndex?: string | number;
   overflow?: 'visible' | 'hidden' | 'scroll' | 'auto' | (string & {});
   overflowX?: 'visible' | 'hidden' | 'scroll' | 'auto';
@@ -94,6 +108,7 @@ export interface CSSProperties {
   textIndent?: string | number;
   textShadow?: string;
   whiteSpace?: 'normal' | 'nowrap' | 'pre' | 'pre-wrap' | 'pre-line' | 'break-spaces';
+  textWrap?: 'wrap' | 'nowrap' | 'balance' | 'pretty' | 'stable';
   wordBreak?: 'normal' | 'break-all' | 'keep-all' | 'break-word';
   wordSpacing?: string | number;
   overflowWrap?: 'normal' | 'break-word' | 'anywhere';
@@ -162,6 +177,9 @@ export interface CSSProperties {
   transform?: string;
   transformOrigin?: string;
   transformStyle?: string;
+  translate?: string;
+  rotate?: string;
+  scale?: string | number;
   perspective?: string | number;
   perspectiveOrigin?: string;
 
@@ -227,12 +245,9 @@ export interface CSSProperties {
   scrollPadding?: string | number;
   overscrollBehavior?: string;
   clipPath?: string;
-}
-
-/**
- * Convert camelCase to kebab-case
- */
-export function toKebabCase(str: string): string {
-  return str.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`);
+  containerType?: 'normal' | 'size' | 'inline-size';
+  containerName?: string;
+  colorScheme?: string;
+  fieldSizing?: 'fixed' | 'content';
 }
 

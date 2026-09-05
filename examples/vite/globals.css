@@ -1,0 +1,28 @@
+/* Design tokens live in plain CSS. cx() values reference them with var(). */
+:root {
+  --gray-1: #fcfcfc;
+  --gray-4: #ededed;
+  --gray-6: #e2e2e2;
+  --gray-11: #6f6f6f;
+  --gray-12: #171717;
+  --blue-9: #0091ff;
+
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --shadow-4: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--gray-12);
+}
+
+/* Every cx() call in the project compiles into this directive. */
+@putty;

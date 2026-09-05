@@ -1,60 +1,27 @@
-// Types
-export type {
-  ThemeConfig,
-  StyleObject,
-  CxResult,
-  CxFunction,
-  PropertyToScale,
-  ResponsiveValue,
-  PropertyValue,
-  TokensForScale,
-} from './types';
+export type { StyleObject, CxResult } from './types.ts';
+export type { CSSProperties } from './css-properties.ts';
 
-export type { CSSProperties } from './css-properties';
-
-// Theme utilities
-export { defineTheme } from './theme';
-
-// Re-export plugin for convenience
-export { zeroCSSPlugin } from './vite-plugin';
-export type { ZeroCSSPluginOptions } from './vite-plugin';
+import type { StyleObject, CxResult } from './types.ts';
 
 /**
- * Create a typed cx function for your theme
- * 
+ * Compile a style object to atomic class names.
+ *
+ * This function never runs. Every `cx({...})` call is replaced at build time
+ * with a literal `{ className: '...' }` object and the generated CSS is emitted
+ * through the `@putty;` PostCSS directive. If you see the error below, the
+ * putty transform is not configured for the bundler that processed this file.
+ *
  * @example
  * ```tsx
- * // styles.ts
- * import { defineTheme, createCx } from 'zero-css';
- * 
- * export const theme = defineTheme({
- *   tokens: {
- *     colors: { primary: '#007bff' },
- *     spacing: { 1: '4px', 2: '8px' },
- *   },
- *   breakpoints: { sm: '640px', md: '768px' },
- * });
- * 
- * export const cx = createCx<typeof theme>();
- * ```
- * 
- * Then in components:
- * ```tsx
- * import { cx } from './styles';
- * 
- * <div {...cx({ display: 'flex', gap: '$1' })} />
+ * import { cx } from 'puttycss';
+ *
+ * <div {...cx({ display: 'flex', gap: 16, '&:hover': { opacity: 0.8 } })} />
  * ```
  */
-export function createCx<T extends import('./types').ThemeConfig>(): import('./types').CxFunction<T> {
-  // This function body is replaced at build time
-  // If you see this at runtime, the plugin is not configured correctly
-  if (process.env.NODE_ENV !== 'production') {
-    console.warn(
-      '[zero-css] cx() was called at runtime. ' +
-      'Make sure the Vite plugin is configured correctly.'
-    );
-  }
-  return ((styles: import('./types').StyleObject<T>) => ({ className: '' })) as import('./types').CxFunction<T>;
+export function cx(_styles: StyleObject): CxResult {
+  throw new Error(
+    '[putty] cx() was called at runtime. The putty transform is not set up ' +
+      'for this file. Add the plugin for your bundler (puttycss/vite, puttycss/next ' +
+      'or puttycss/webpack) so cx() calls are compiled away.',
+  );
 }
-
-
