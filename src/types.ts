@@ -18,6 +18,13 @@ export type StyleObject = {
 };
 
 /**
+ * Existing class names to combine with the generated ones, as the optional first
+ * argument of `cx()`. Falsy values are skipped so `props.className` can be passed
+ * straight through.
+ */
+export type ClassNames = string | false | null | undefined;
+
+/**
  * What `cx()` compiles to.
  */
 export interface CxResult {

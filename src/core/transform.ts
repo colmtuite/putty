@@ -1,4 +1,4 @@
-import { extract, mayContainCx } from './extract.ts';
+import { extract, mayContainCx, type ClassNamesArg } from './extract.ts';
 import { rulesFor, type Rule } from './css.ts';
 
 export interface TransformResult {
@@ -30,11 +30,11 @@ export function transformSource(code: string, fileName: string): TransformResult
   for (const call of calls) {
     const callRules = rulesFor(call.styles);
     rules.push(...callRules);
-    const classNames = [...new Set(callRules.map((r) => r.className))].join(' ');
+    const generated = [...new Set(callRules.map((r) => r.className))].join(' ');
     edits.push({
       start: call.start,
       end: call.end,
-      text: `{ className: "${classNames}" }`,
+      text: `{ className: ${classNameExpression(code, call.classNames, generated)} }`,
     });
   }
 
@@ -45,6 +45,22 @@ export function transformSource(code: string, fileName: string): TransformResult
   }
 
   return { code: applyEdits(code, edits), rules, changed: true };
+}
+
+/**
+ * The JavaScript expression for the final `className`. A literal class string is
+ * folded in at build time. Any other expression is kept verbatim and joined at
+ * runtime, skipping falsy values so `props.className` may be undefined.
+ */
+function classNameExpression(code: string, classNames: ClassNamesArg | null, generated: string): string {
+  if (!classNames) return JSON.stringify(generated);
+  if (classNames.kind === 'literal') {
+    const literal = classNames.value.trim().split(/\s+/).filter(Boolean);
+    return JSON.stringify([...literal, generated].filter(Boolean).join(' '));
+  }
+  const expr = code.slice(classNames.start, classNames.end);
+  if (!generated) return `[${expr}].filter(Boolean).join(" ")`;
+  return `[${expr}, ${JSON.stringify(generated)}].filter(Boolean).join(" ")`;
 }
 
 /**

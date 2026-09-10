@@ -9,8 +9,18 @@ export interface Span {
   end: number;
 }
 
+/**
+ * The optional first argument of `cx(classNames, styles)`. A string literal is
+ * folded into the output at build time; any other expression is kept verbatim
+ * and concatenated at runtime.
+ */
+export type ClassNamesArg =
+  | { kind: 'literal'; value: string }
+  | { kind: 'expression'; start: number; end: number };
+
 export interface ExtractedCall extends Span {
   styles: StyleTree;
+  classNames: ClassNamesArg | null;
 }
 
 export interface CxImport extends Span {
@@ -84,14 +94,43 @@ export function extract(code: string, fileName: string): ExtractResult {
             `because it is compiled away at build time.`,
         );
       }
-      if (call.arguments.length !== 1) {
-        return fail(call, `${cxImport.localName}() takes exactly one argument, an object literal.`);
+      const name = cxImport.localName;
+      const usage = `${name}(styles) or ${name}(classNames, styles)`;
+      if (call.arguments.length < 1 || call.arguments.length > 2) {
+        return fail(call, `${name}() takes one or two arguments: ${usage}.`);
       }
-      const arg = unwrap(call.arguments[0]);
+
+      let classNames: ClassNamesArg | null = null;
+      if (call.arguments.length === 2) {
+        const first = call.arguments[0];
+        const inner = unwrap(first);
+        if (ts.isObjectLiteralExpression(inner)) {
+          return fail(first, `The first argument of ${usage} is a class string, not a style object.`);
+        }
+        if (ts.isStringLiteral(inner) || ts.isNoSubstitutionTemplateLiteral(inner)) {
+          classNames = { kind: 'literal', value: inner.text };
+        } else {
+          const nested = findReference(first, name);
+          if (nested) {
+            return fail(
+              nested,
+              `${name}() cannot be nested inside the class string of another ${name}() call. ` +
+                `Put all styles for the element in one style object.`,
+            );
+          }
+          classNames = { kind: 'expression', start: first.getStart(sf), end: first.getEnd() };
+        }
+      }
+
+      const stylesArg = call.arguments[call.arguments.length - 1];
+      const arg = unwrap(stylesArg);
       if (!ts.isObjectLiteralExpression(arg)) {
+        if (call.arguments.length === 1 && (ts.isStringLiteral(arg) || ts.isTemplateLiteral(arg))) {
+          return fail(arg, `${name}() with a class string also needs a style object: ${usage}.`);
+        }
         return fail(
           arg,
-          `${cxImport.localName}() must be given an object literal. Variables and expressions cannot ` +
+          `${name}() must be given an object literal. Variables and expressions cannot ` +
             `be compiled statically. Found ${ts.SyntaxKind[arg.kind]}.`,
         );
       }
@@ -99,8 +138,9 @@ export function extract(code: string, fileName: string): ExtractResult {
         start: call.getStart(sf),
         end: call.getEnd(),
         styles: evaluateObject(arg, sf, fail),
+        classNames,
       });
-      return; // don't descend into the argument again
+      return; // don't descend into the arguments again
     }
     ts.forEachChild(node, visit);
   };
@@ -139,6 +179,21 @@ function isReference(node: ts.Identifier): boolean {
     return false;
   }
   return true;
+}
+
+/** First value reference to `name` inside `root`, or null. */
+function findReference(root: ts.Node, name: string): ts.Identifier | null {
+  let found: ts.Identifier | null = null;
+  const visit = (node: ts.Node): void => {
+    if (found) return;
+    if (ts.isIdentifier(node) && node.text === name && isReference(node)) {
+      found = node;
+      return;
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(root);
+  return found;
 }
 
 /** Strip parentheses, `as`, `satisfies` and non-null wrappers. */

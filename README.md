@@ -5,26 +5,17 @@ Zero-runtime, zero-config CSS-in-JS. Plain CSS for component styles. Putty for l
 ```tsx
 import { cx } from 'puttycss';
 
-<button
-  {...cx({
-    display: 'inline-flex',
-    gap: 8,
-    padding: '8px 16px',
-    color: 'var(--gray-12)',
-    '&:hover': {
-      backgroundColor: 'var(--gray-4)'
-    },
-    '@media (min-width: 768px)': { 
-      padding: '12px 24px'
-    },
-  })}
-/>
+<div {...cx({ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: 16 })}>
+  <button {...cx('button', { fontFamily: 'monospace', color: 'var(--gray-12)' })}>Save</button>
+</div>
 ```
 
 At build time this becomes
 
 ```tsx
-<button {...{ className: "p1h8cdyu p4e729l pj2ma0x p15lx4rp pdj23pi p1u5ukp2" }} />
+<div {...{ className: "pxocrn6 p7t0jil p4e729l p1vnpodd" }}>
+  <button {...{ className: "button p2momd9 p15lx4rp" }}>Save</button>
+</div>
 ```
 
 and the matching CSS is generated into your stylesheet. Nothing from `puttycss` is in your bundle: no `cx` function, no style injection, no provider. It works in Server Components because there is nothing to run.
@@ -45,19 +36,18 @@ npm install -D puttycss
 
 Two pieces: a transform for your bundler that compiles `cx()` away, and a PostCSS plugin that generates the stylesheet.
 
-### 1. Add the `@putty;` directive to your global CSS
+### 1. Add the `@putty;` directive to the end of your global CSS
 
 ```css
 /* globals.css */
-:root {
-  --gray-4: #ededed;
-  --gray-12: #171717;
-}
+@import './tokens.css' layer(tokens);
+@import './components.css' layer(components);
+
 
 @putty;
 ```
 
-Every `cx()` call in your project compiles into that line.
+Every `cx()` call in your project compiles into that line. Import your component CSS into a `@layer` so `cx()` overrides always win.
 
 ### 2. Configure your bundler
 
@@ -116,35 +106,41 @@ Add `puttycss/postcss` to your PostCSS config for the stylesheet, and use `trans
 
 ## Writing styles
 
-### Everything must be static
-
-Because `cx()` is compiled away, its argument has to be an object literal made of literal strings, numbers and nested object literals. These are build errors, reported with file, line and column:
+Values are literal strings and numbers. You never need to pass a runtime value through `cx()`, and it's a terrible idea in 100% of cases:
 
 ```tsx
-cx({ color: theme.red });               // variable
-cx({ color: dark ? 'white' : 'black' }); // conditional
-cx({ ...base, color: 'red' });          // spread
-cx(styles);                              // not a literal
-```
-
-For values that change at runtime, use a CSS custom property:
-
-```tsx
+// Never do this
 <div style={{ '--x': `${offset}px` }} {...cx({ transform: 'translateX(var(--x))' })} />
 ```
 
-For variants, call `cx()` once per variant and pick a result:
+Runtime values are the component's job. It writes them to the element as an inline `style` or a `data-` attribute, and plain CSS reads them.
+
+### One `cx()` per element
+
+Style components with plain CSS. Use one `cx()` per element for layout and overrides. Pass existing class names as the first argument:
 
 ```tsx
-const primary = cx({ backgroundColor: 'blue' });
-const secondary = cx({ backgroundColor: 'gray' });
-<button {...(isPrimary ? primary : secondary)} />
+<button {...cx('button secondary', { fontFamily: 'monospace', color: 'var(--gray-12)' })} />
 ```
 
-Since `cx()` returns `{ className }`, combining with other classes is just string concatenation:
+### CSS Modules
+
+Pass the module class as the first argument, and wrap module files in the `components` layer:
 
 ```tsx
-<div className={`${cx({ display: 'flex' }).className} ${props.className ?? ''}`} />
+import styles from './Button.module.css';
+
+<button {...cx(styles.button, { marginTop: 16 })} />
+```
+
+```css
+/* Button.module.css */
+@layer components {
+  .button {
+    padding: 8px 16px;
+    border-radius: 6px;
+  }
+}
 ```
 
 ## Options
@@ -158,6 +154,10 @@ Since `cx()` returns `{ className }`, combining with other classes is just strin
 | `cwd`     | `process.cwd()`                      | Base directory.                                                         |
 
 `puttycss/vite` also accepts `postcss: false` to opt out of auto-registering the PostCSS plugin.
+
+## Author
+
+Colm Tuite
 
 ## License
 

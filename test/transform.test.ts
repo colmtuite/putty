@@ -73,7 +73,11 @@ const failing: Array<[string, string, RegExp]> = [
   ['string on selector key', `cx({ '&:hover': 'red' })`, /must map to a style object/],
   ['non-object argument', `cx(styles)`, /must be given an object literal/],
   ['passed as value', `const f = cx;`, /must be called directly/],
-  ['wrong arity', `cx({}, {})`, /exactly one argument/],
+  ['no arguments', `cx()`, /one or two arguments/],
+  ['three arguments', `cx('a', {}, {})`, /one or two arguments/],
+  ['two style objects', `cx({}, {})`, /first argument .* is a class string/],
+  ['class string without styles', `cx('button')`, /also needs a style object/],
+  ['nested cx in class string', `cx(cx({ color: 'red' }).className, { color: 'blue' })`, /cannot be nested/],
 ];
 
 for (const [name, snippet, re] of failing) {
@@ -84,6 +88,48 @@ for (const [name, snippet, re] of failing) {
     );
   });
 }
+
+test('folds a literal class string into the output', () => {
+  const { code, rules } = tsx(`import { cx } from 'puttycss';
+const a = cx('button  secondary ', { color: 'red' });`);
+  assert.equal(rules.length, 1);
+  assert.match(code, /const a = \{ className: "button secondary p\w+" \};/);
+});
+
+test('accepts a template literal without substitutions as the class string', () => {
+  const { code } = tsx('import { cx } from \'puttycss\';\nconst a = cx(`button`, { color: \'red\' });');
+  assert.match(code, /className: "button p\w+"/);
+});
+
+test('joins a runtime class expression, skipping falsy values', () => {
+  const { code } = tsx(`import { cx } from 'puttycss';
+const a = cx(props.className, { color: 'red' });
+const b = cx(active && 'is-active', { color: 'red' });`);
+  assert.match(code, /const a = \{ className: \[props\.className, "p\w+"\]\.filter\(Boolean\)\.join\(" "\) \};/);
+  assert.match(code, /const b = \{ className: \[active && 'is-active', "p\w+"\]\.filter\(Boolean\)\.join\(" "\) \};/);
+  assert.doesNotMatch(code, /puttycss/);
+});
+
+test('keeps line numbers stable when the class expression spans lines', () => {
+  const src = `import { cx } from 'puttycss';
+const a = cx(
+  props.className,
+  { color: 'red' },
+);
+const marker = 1;`;
+  const { code } = tsx(src);
+  assert.equal(code.split('\n').length, src.split('\n').length);
+  assert.equal(code.split('\n')[5], 'const marker = 1;');
+});
+
+test('class string with an empty style object yields just the classes', () => {
+  const { code, rules } = tsx(`import { cx } from 'puttycss';
+const a = cx('button', {});
+const b = cx(props.className, {});`);
+  assert.equal(rules.length, 0);
+  assert.match(code, /const a = \{ className: "button" \};/);
+  assert.match(code, /const b = \{ className: \[props\.className\]\.filter\(Boolean\)\.join\(" "\) \};/);
+});
 
 test('comments inside cx() are fine', () => {
   const r = tsx(`import { cx } from 'puttycss';
