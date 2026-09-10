@@ -150,7 +150,7 @@ import styles from './Button.module.css';
 | Option    | Default                              | Description                                                             |
 | --------- | ------------------------------------ | ----------------------------------------------------------------------- |
 | `content` | `['.']`                              | Files or directories to scan for `cx()` calls, relative to `cwd`.       |
-| `exclude` | `node_modules`, `.git`, `dist`, `.next`, … | Directory names skipped anywhere in the tree.                   |
+| `exclude` | `[]`                                 | Directory names to skip anywhere in the tree, in addition to `node_modules`, `.git`, `dist`, `.next`, … |
 | `cwd`     | `process.cwd()`                      | Base directory.                                                         |
 
 `puttycss/vite` also accepts `postcss: false` to opt out of auto-registering the PostCSS plugin.

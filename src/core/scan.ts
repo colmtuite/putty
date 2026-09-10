@@ -14,7 +14,7 @@ export const DEFAULT_EXCLUDE = [
 export interface ScanOptions {
   /** Files or directories to scan, relative to `cwd`. Default: `['.']`. */
   content?: string[];
-  /** Directory names to skip anywhere in the tree. */
+  /** Directory names to skip anywhere in the tree, in addition to the defaults. */
   exclude?: string[];
   cwd?: string;
 }
@@ -42,7 +42,7 @@ const cache = new Map<string, CacheEntry>();
  */
 export function scan(options: ScanOptions = {}): ScanResult {
   const cwd = options.cwd ?? process.cwd();
-  const exclude = new Set(options.exclude ?? DEFAULT_EXCLUDE);
+  const exclude = new Set([...DEFAULT_EXCLUDE, ...(options.exclude ?? [])]);
   const roots = (options.content ?? ['.']).map((p) => path.resolve(cwd, p));
 
   const files: string[] = [];

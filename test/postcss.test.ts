@@ -68,6 +68,19 @@ test('content option limits the scan and errors carry file locations', async () 
   );
 });
 
+test('exclude option adds to the defaults instead of replacing them', async () => {
+  const dir = fixture({
+    'src/A.tsx': `import { cx } from 'puttycss'; cx({ color: 'red' });`,
+    'src/fixtures/F.tsx': `import { cx } from 'puttycss'; cx({ color: 'green' });`,
+    'node_modules/pkg/index.js': `import { cx } from 'puttycss'; cx({ color: 'blue' });`,
+  });
+
+  const { css } = await postcss([putty({ cwd: dir, exclude: ['fixtures'] })]).process('@putty;', { from: undefined });
+  assert.match(css, /color: red/);
+  assert.doesNotMatch(css, /color: green/, 'user exclude is applied');
+  assert.doesNotMatch(css, /color: blue/, 'node_modules is still excluded');
+});
+
 test('picks up edits between runs (mtime cache invalidation)', async () => {
   const dir = fixture({ 'A.tsx': `import { cx } from 'puttycss'; cx({ color: 'red' });` });
   const run = () => postcss([putty({ cwd: dir })]).process('@putty;', { from: undefined }).then((r) => r.css);
