@@ -1,4 +1,5 @@
 import { transformSource, lineIdentityMap, mayContainCx, ExtractError } from './core/index.ts';
+import { state, missingDirectiveWarning } from './core/state.ts';
 
 /**
  * Minimal slice of webpack's LoaderContext so we don't need `webpack` as a dependency.
@@ -8,6 +9,30 @@ interface LoaderContext {
   resourcePath: string;
   callback: (err: Error | null, content?: string, sourceMap?: unknown) => void;
   cacheable?: (flag?: boolean) => void;
+  /** Present under webpack; absent under Turbopack. */
+  _compiler?: Compiler;
+}
+
+interface Compiler {
+  name?: string;
+  hooks: { done: { tap: (name: string, fn: () => void) => void } };
+}
+
+const checkedCompilers = new WeakSet<Compiler>();
+
+/**
+ * Warn at the end of a compilation if cx() was compiled but no CSS was generated.
+ * Next.js runs several compilers; only the client one processes CSS, so the
+ * others are skipped to avoid false alarms.
+ */
+function checkOnDone(compiler: Compiler | undefined): void {
+  if (!compiler || checkedCompilers.has(compiler)) return;
+  if (compiler.name && compiler.name !== 'client') return;
+  checkedCompilers.add(compiler);
+  compiler.hooks.done.tap('puttycss', () => {
+    const message = missingDirectiveWarning();
+    if (message) console.warn(message);
+  });
 }
 
 /**
@@ -35,6 +60,8 @@ function puttyLoader(this: LoaderContext, source: string): void {
       this.callback(null, source);
       return;
     }
+    state.filesCompiled.add(this.resourcePath);
+    checkOnDone(this._compiler);
     this.callback(null, result.code, lineIdentityMap(source, this.resourcePath));
   } catch (e) {
     if (e instanceof ExtractError) {

@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { Plugin } from 'vite';
 import { transformSource, lineIdentityMap, mayContainCx, ExtractError } from './core/index.ts';
+import { state, missingDirectiveWarning } from './core/state.ts';
 import puttyPostcss, { type PuttyPostcssOptions } from './postcss.ts';
 
 export interface PuttyViteOptions extends PuttyPostcssOptions {
@@ -31,8 +32,29 @@ const POSTCSS_CONFIG_FILES = [
  * export default defineConfig({ plugins: [putty(), react()] });
  * ```
  */
+/** In dev, wait this long after the last cx() compile before checking that CSS was generated. */
+const DEV_CHECK_DELAY_MS = 3000;
+
 export function putty(options: PuttyViteOptions = {}): Plugin {
   const { postcss: autoPostcss = true, ...scanOptions } = options;
+
+  let isDev = false;
+  let warn: (message: string) => void = console.warn;
+  let devTimer: ReturnType<typeof setTimeout> | undefined;
+  let devWarned = false;
+
+  const scheduleDevCheck = () => {
+    if (!isDev || devWarned) return;
+    clearTimeout(devTimer);
+    devTimer = setTimeout(() => {
+      const message = missingDirectiveWarning();
+      if (message) {
+        devWarned = true;
+        warn(message);
+      }
+    }, DEV_CHECK_DELAY_MS);
+    devTimer.unref?.();
+  };
 
   return {
     name: 'puttycss',
@@ -53,6 +75,11 @@ export function putty(options: PuttyViteOptions = {}): Plugin {
       };
     },
 
+    configResolved(config) {
+      isDev = config.command === 'serve';
+      warn = (message) => config.logger.warn(message);
+    },
+
     transform(code, id) {
       const file = id.split('?')[0];
       if (!SOURCE_RE.test(file) || file.includes('/node_modules/')) return null;
@@ -61,6 +88,8 @@ export function putty(options: PuttyViteOptions = {}): Plugin {
       try {
         const result = transformSource(code, file);
         if (!result.changed) return null;
+        state.filesCompiled.add(file);
+        scheduleDevCheck();
         return { code: result.code, map: lineIdentityMap(code, file) };
       } catch (e) {
         if (e instanceof ExtractError) {
@@ -68,6 +97,12 @@ export function putty(options: PuttyViteOptions = {}): Plugin {
         }
         throw e;
       }
+    },
+
+    buildEnd() {
+      if (isDev) return;
+      const message = missingDirectiveWarning();
+      if (message) this.warn(message);
     },
   };
 }

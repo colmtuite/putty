@@ -1,5 +1,6 @@
 import type { PluginCreator } from 'postcss';
 import { scan, SOURCE_GLOB, type ScanOptions } from './core/scan.ts';
+import { state } from './core/state.ts';
 
 export interface PuttyPostcssOptions extends ScanOptions {}
 
@@ -25,6 +26,7 @@ const putty: PluginCreator<PuttyPostcssOptions> = (options = {}) => ({
   AtRule: {
     [DIRECTIVE]: (atRule, { result, postcss }) => {
       const from = result.opts.from;
+      state.directiveRuns++;
       const { css, files, dirs } = scan(options);
 
       // Tell the bundler which files feed this stylesheet so edits trigger a rebuild.
