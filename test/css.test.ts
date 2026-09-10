@@ -64,7 +64,35 @@ test('class names are deterministic and independent of declaration order', () =>
   const a = rulesFor({ display: 'flex', gap: 16 });
   const b = rulesFor({ gap: '16px', display: 'flex' });
   assert.deepEqual(new Set(a.map((r) => r.className)), new Set(b.map((r) => r.className)));
-  assert.match(a[0].className, /^p[a-z0-9]{1,7}$/);
+  assert.match(a[0].className, /^p[a-z0-9]{1,11}$/);
+});
+
+test('hash: no collisions across a large, realistic set of declarations', () => {
+  const props = ['margin', 'padding', 'gap', 'width', 'height', 'top', 'left', 'fontSize', 'lineHeight', 'opacity'];
+  const selectors = [null, '&:hover', '&:focus-visible', '& > svg'];
+  const media = [[], ['@media (min-width: 768px)'], ['@media (min-width: 1024px)']];
+  const seen = new Map<string, string>();
+  let count = 0;
+  for (const property of props) {
+    for (let v = 0; v < 400; v++) {
+      for (const selector of selectors) {
+        for (const atRules of media) {
+          const [rule] = rulesFor(
+            atRules.reduceRight<Record<string, unknown>>(
+              (inner, at) => ({ [at]: inner }),
+              selector ? { [selector]: { [property]: v } } : { [property]: v },
+            ) as never,
+          );
+          const id = `${property}:${v}:${selector}:${atRules.join('|')}`;
+          const prev = seen.get(rule.className);
+          assert.equal(prev, undefined, `collision: ${prev} vs ${id} -> ${rule.className}`);
+          seen.set(rule.className, id);
+          count++;
+        }
+      }
+    }
+  }
+  assert.equal(count, 48_000);
 });
 
 test('renderCSS: deterministic order, shorthands before longhands, mobile-first media', () => {

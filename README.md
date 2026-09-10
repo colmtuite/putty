@@ -13,8 +13,8 @@ import { cx } from 'puttycss';
 At build time this becomes
 
 ```tsx
-<div {...{ className: "pxocrn6 p7t0jil p4e729l p1vnpodd" }}>
-  <button {...{ className: "button p2momd9 p15lx4rp" }}>Save</button>
+<div {...{ className: "p16gy2zcgqam p5udv44wyvd phq3jtm8k45 po0p67wec0r" }}>
+  <button {...{ className: "button pti5bcmcgj5 pgsnazddux7" }}>Save</button>
 </div>
 ```
 
