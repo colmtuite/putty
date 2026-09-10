@@ -29,8 +29,10 @@ and the matching CSS is generated into your stylesheet. Nothing from `puttycss` 
 ## Install
 
 ```sh
-npm install -D puttycss
+npm install -D puttycss typescript
 ```
+
+`typescript` is needed at build time to parse your source files, even in JavaScript projects.
 
 ## Setup
 
