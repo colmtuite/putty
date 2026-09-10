@@ -108,21 +108,53 @@ Add `puttycss/postcss` to your PostCSS config for the stylesheet, and use `trans
 
 ## Writing styles
 
-Values are literal strings and numbers. You never need to pass a runtime value through `cx()`, and it's a terrible idea in 100% of cases:
+### Components in plain CSS
+
+Component styles live in CSS, inside the `components` layer. Variants are compound classes; state comes from pseudo-classes and `data-` attributes:
+
+```css
+/* components.css */
+@layer components {
+  .button {
+    display: inline-flex;
+    align-items: center;
+    padding-inline: 12px;
+    border-radius: 8px;
+    background: var(--gray-12);
+    color: var(--gray-1);
+  }
+
+  @media (hover: hover) {
+    .button:hover {
+      background: var(--gray-11);
+    }
+  }
+
+  .button[data-loading] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .button.secondary {
+    background: var(--gray-4);
+    color: var(--gray-12);
+  }
+}
+```
+
+### One `cx()` per element
+
+Use one `cx()` per element for layout and overrides. Pass existing class names as the first argument:
+
+```tsx
+<button {...cx('button secondary', { fontFamily: 'monospace', color: 'var(--gray-12)' })} />
+```
+
+Values are literal strings and numbers. You never need to pass a runtime value through `cx()`. It's never a good idea, and it's never necessary.
 
 ```tsx
 // Never do this
 <div style={{ '--x': `${offset}px` }} {...cx({ transform: 'translateX(var(--x))' })} />
-```
-
-Runtime values are the component's job. It writes them to the element as an inline `style` or a `data-` attribute, and plain CSS reads them.
-
-### One `cx()` per element
-
-Style components with plain CSS. Use one `cx()` per element for layout and overrides. Pass existing class names as the first argument:
-
-```tsx
-<button {...cx('button secondary', { fontFamily: 'monospace', color: 'var(--gray-12)' })} />
 ```
 
 ### CSS Modules
