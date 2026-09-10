@@ -1,6 +1,6 @@
 {
   "name": "puttycss",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Zero-runtime, zero-config CSS-in-JS. Write typed style objects, ship atomic CSS and no JavaScript.",
   "license": "MIT",
   "type": "module",
