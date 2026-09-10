@@ -121,6 +121,28 @@ test('renderCSS: em/rem breakpoints keep their unit and sort correctly', () => {
   assert.doesNotMatch(css, /40rempx/);
 });
 
+test('renderCSS: range syntax media queries sort with the legacy syntax', () => {
+  const css = renderCSS(rulesFor({
+    '@media (width <= 480px)': { color: 'max-a' },
+    '@media (max-width: 600px)': { color: 'max-b' },
+    '@media (width >= 1024px)': { color: 'min-c' },
+    '@media (768px <= width <= 1023px)': { color: 'min-b' },
+    '@media (min-width: 640px)': { color: 'min-a' },
+    '@media (width > 80em)': { color: 'min-d' },
+    '@media (prefers-color-scheme: dark)': { color: 'other' },
+  }));
+  const at = (s: string) => css.indexOf(`color: ${s}`);
+  // min-width ascending, across both syntaxes (640 < 768 < 1024 < 1280)
+  assert.ok(at('min-a') < at('min-b'));
+  assert.ok(at('min-b') < at('min-c'));
+  assert.ok(at('min-c') < at('min-d'));
+  // then max-width descending (600 before 480)
+  assert.ok(at('min-d') < at('max-b'));
+  assert.ok(at('max-b') < at('max-a'));
+  // then everything else
+  assert.ok(at('max-a') < at('other'));
+});
+
 test('renderCSS: nested at-rules and selectors render correctly', () => {
   const css = renderCSS(rulesFor({
     color: 'red',

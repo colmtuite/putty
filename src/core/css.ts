@@ -190,21 +190,46 @@ function toPx(value: string): number {
   return m[2] === 'em' || m[2] === 'rem' ? n * 16 : n;
 }
 
+const LENGTH = String.raw`([\d.]+\s*(?:px|em|rem)?)`;
+
+/**
+ * Lower bound on width from a media query, in px. Understands both syntaxes:
+ * `(min-width: 768px)`, `(width >= 768px)`, `(width > 768px)`, `(768px <= width)`,
+ * and the lower bound of a range like `(768px <= width <= 1023px)`.
+ */
+const MIN_WIDTH = [
+  new RegExp(String.raw`min-width:\s*${LENGTH}`),
+  new RegExp(String.raw`width\s*>=?\s*${LENGTH}`),
+  new RegExp(String.raw`${LENGTH}\s*<=?\s*width`),
+];
+
+/** Upper bound on width, mirroring `MIN_WIDTH`. */
+const MAX_WIDTH = [
+  new RegExp(String.raw`max-width:\s*${LENGTH}`),
+  new RegExp(String.raw`width\s*<=?\s*${LENGTH}`),
+  new RegExp(String.raw`${LENGTH}\s*>=?\s*width`),
+];
+
+function widthBound(atRule: string, patterns: RegExp[]): number {
+  for (const re of patterns) {
+    const m = re.exec(atRule);
+    if (m) {
+      const px = toPx(m[1]);
+      if (!Number.isNaN(px)) return px;
+    }
+  }
+  return Number.NaN;
+}
+
 /**
  * Sort key for a single at-rule. Mobile-first: min-width ascending, then
  * max-width descending, then everything else alphabetically.
  */
 function atRuleRank(atRule: string): [number, number, string] {
-  const min = /min-width:\s*([^)]+)\)/.exec(atRule);
-  if (min) {
-    const px = toPx(min[1]);
-    if (!Number.isNaN(px)) return [0, px, atRule];
-  }
-  const max = /max-width:\s*([^)]+)\)/.exec(atRule);
-  if (max) {
-    const px = toPx(max[1]);
-    if (!Number.isNaN(px)) return [1, -px, atRule];
-  }
+  const min = widthBound(atRule, MIN_WIDTH);
+  if (!Number.isNaN(min)) return [0, min, atRule];
+  const max = widthBound(atRule, MAX_WIDTH);
+  if (!Number.isNaN(max)) return [1, -max, atRule];
   return [2, 0, atRule];
 }
 
