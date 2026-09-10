@@ -19,19 +19,3 @@ export function hash(str: string): string {
   const lo = b >>> 0; // 32 bits
   return (hi * 0x100000000 + lo).toString(36);
 }
-
-/**
- * Generate a class name from a style declaration
- */
-export function generateClassName(
-  property: string,
-  value: string,
-  breakpoint?: string,
-  selector?: string
-): string {
-  const parts = [property, value];
-  if (breakpoint) parts.push(breakpoint);
-  if (selector) parts.push(selector);
-  return `z${hash(parts.join(':'))}`;
-}
-
