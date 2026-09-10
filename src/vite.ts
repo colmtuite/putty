@@ -36,6 +36,8 @@ export function putty(options: PuttyViteOptions = {}): Plugin {
 
   return {
     name: 'puttycss',
+    // Run before other transforms (e.g. @vitejs/plugin-react) regardless of plugin order.
+    enforce: 'pre',
 
     config(userConfig) {
       if (!autoPostcss) return;
