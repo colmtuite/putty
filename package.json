@@ -75,5 +75,8 @@
     "nextjs",
     "webpack-loader",
     "typescript"
-  ]
+  ],
+  "dependencies": {
+    "csstype": "^3.2.3"
+  }
 }
